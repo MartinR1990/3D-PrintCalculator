@@ -16,16 +16,17 @@ h1{font-size:22px;margin:4px 0 12px}
 @media(max-width:860px){.grid{grid-template-columns:1fr}}
 .card{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:14px;margin-bottom:12px}
 .card h2{font-size:15px;margin:0 0 10px}
-.row{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.row{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:10px}
 @media(min-width:560px){.row{grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}}
 label{display:block;font-size:13px;color:var(--mu)}
-input[type=text]{width:100%;margin-top:4px;padding:11px 10px;font:inherit;font-size:16px;color:var(--tx);background:var(--bg);border:1px solid var(--bd);border-radius:10px;-webkit-appearance:none;appearance:none}
-input:focus{outline:2px solid var(--ac)}
+input[type=text],select,textarea{width:100%;margin-top:4px;padding:11px 10px;font:inherit;font-size:16px;color:var(--tx);background:var(--bg);border:1px solid var(--bd);border-radius:10px;-webkit-appearance:none;appearance:none}
+textarea{min-height:90px;font-size:13px}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--ac)}
 .seg{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:12px}
-.seg button{padding:12px 0;font-weight:600;border-radius:10px}
+.seg button{padding:12px 0;font-weight:600}
 .seg button.on{background:var(--ac);color:#fff;border-color:var(--ac)}
-@media(prefers-color-scheme:dark){.seg button.on{color:#0b1220}}
 button{font:inherit;padding:10px 12px;border-radius:10px;border:1px solid var(--bd);background:var(--card);color:var(--tx);cursor:pointer}
+button.pri{background:var(--ac);color:#fff;border-color:var(--ac);font-weight:600}
 .big{font-size:34px;font-weight:700;letter-spacing:-.5px}
 .pill{display:inline-block;background:var(--acs);color:var(--ac);border-radius:99px;padding:2px 10px;font-size:12px;font-weight:600}
 .line{display:flex;justify-content:space-between;gap:8px;padding:6px 0;border-bottom:1px dashed var(--bd)}
@@ -38,22 +39,22 @@ button{font:inherit;padding:10px 12px;border-radius:10px;border:1px solid var(--
 .leg b{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:4px}
 .hint{font-size:12.5px;color:var(--mu);margin:8px 0 0}
 .ok{color:var(--ok)}
-details.card summary{font-weight:600;cursor:pointer;font-size:15px;padding:2px 0}
-details.card[open] summary{margin-bottom:12px}
-.chk{display:flex;align-items:center;gap:10px;color:var(--tx);font-size:15px;margin:4px 0 10px}
+details.card summary{font-weight:600;cursor:pointer;font-size:15px}
+details.card[open] summary{margin-bottom:4px}
+.chk{display:flex;align-items:center;gap:10px;color:var(--tx);font-size:15px;margin:10px 0 0}
 .chk input{width:22px;height:22px;margin:0}
-.ptab{width:100%;border-collapse:collapse;font-size:14px}
+.ptab{width:100%;border-collapse:collapse;font-size:14px;margin-top:8px}
 .ptab th{text-align:left;color:var(--mu);font-weight:500;font-size:12.5px;padding:0 4px 4px}
-.ptab td{padding:3px 4px}
-.ptab td:first-child{font-weight:600;width:60px}
+.ptab td{padding:3px 4px}.ptab td:first-child{font-weight:600;width:60px}
+.job{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:8px 0;border-bottom:1px dashed var(--bd)}
+.job:last-child{border:0}.job small{color:var(--mu);display:block}
+.btns{display:flex;gap:8px;margin-top:10px}.btns>*{flex:1}
 .res{position:sticky;top:calc(env(safe-area-inset-top,0px) + 12px)}
 .bottom{display:none}
 @media(max-width:860px){
- .res{position:static}
- .bottom{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:10;justify-content:space-between;align-items:center;gap:10px;background:var(--card);border-top:1px solid var(--bd);padding:10px 16px calc(10px + env(safe-area-inset-bottom,0px))}
- .bottom .p{font-size:26px;font-weight:700}
- .bottom small{color:var(--mu);display:block;font-size:12px;text-align:right}
-}
+.res{position:static}
+.bottom{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:10;justify-content:space-between;align-items:center;gap:10px;background:var(--card);border-top:1px solid var(--bd);padding:10px 16px calc(10px + env(safe-area-inset-bottom,0px))}
+.bottom .p{font-size:26px;font-weight:700}.bottom small{color:var(--mu);text-align:right;font-size:12px}}
 </style>
 </head>
 <body>
@@ -62,138 +63,183 @@ details.card[open] summary{margin-bottom:12px}
 <div class="grid">
 <div>
 <div class="card">
-<div class="seg" id="seg"></div>
-<div class="row">
-<label>Filamentpreis (€/kg)<input id="fil" type="text" inputmode="decimal"></label>
-<label>Strompreis (€/kWh)<input id="kwh" type="text" inputmode="decimal"></label>
-<label>Gewicht pro Stück (g)<input id="gram" type="text" inputmode="decimal"></label>
+<label>Slicer-Werte einfügen (z. B. “2h 30m, 48,3 g”)<input id="paste" type="text" placeholder="Zeit und Gewicht aus Bambu Studio"></label>
+<div class="seg" style="margin-top:12px" id="seg"></div>
+<div class="row" style="margin-top:0">
+<label>Filament (€/kg)<input id="fil" type="text" inputmode="decimal"></label>
+<label>Strom (€/kWh)<input id="kwh" type="text" inputmode="decimal"></label>
+<label>Gewicht/Stück (g)<input id="gram" type="text" inputmode="decimal"></label>
 <label>Stückzahl<input id="qty" type="text" inputmode="numeric"></label>
-<label>Druckzeit Stunden<input id="h" type="text" inputmode="numeric"></label>
-<label>Druckzeit Minuten<input id="m" type="text" inputmode="numeric"></label>
+<label>Zeit Std.<input id="h" type="text" inputmode="numeric"></label>
+<label>Zeit Min.<input id="m" type="text" inputmode="numeric"></label>
 </div>
+<label style="margin-top:10px">Bezeichnung dieses Drucks<input id="name" type="text" placeholder="z. B. Gehäuse"></label><button class="pri" id="add" style="width:100%;margin-top:10px">＋ Zum Auftrag hinzufügen</button><p class="hint" id="curHint"></p>
 <p class="hint" id="wattHint"></p>
 </div>
 
-<details class="card"><summary>Materialprofile (Leistung &amp; Ausschuss)</summary>
-<table class="ptab"><thead><tr><th></th><th>Ø Leistung (W)</th><th>Ausschuss (%)</th></tr></thead><tbody id="ptab"></tbody></table>
-<p class="hint">Startwerte sind Schätzungen für den Bambu Lab P1S inkl. Heizbett, Düse und Lüfter. ASA und PETG ziehen mehr wegen heißerem Bett und Kammer. Am genauesten wird es mit einer Messsteckdose über einen kompletten Druck.</p></details>
+<div class="card" id="order"><h2>Auftrag</h2>
+<div id="plist"></div><p class="hint" id="noP">Noch keine Positionen. Gib oben einen Druck ein und tipp auf „Zum Auftrag hinzufügen“.</p>
+<div id="ordx"><div id="tot" style="margin-top:6px"></div>
+<label style="margin-top:10px">Auftragsname / Kunde<input id="oname" type="text" placeholder="z. B. Kunde X"></label>
+<p class="hint">Ertrag pro Druckstunde: <span id="hourly" class="ok sum">–</span></p>
+<div class="btns"><button class="pri" id="quote">Angebot kopieren</button><button id="save">Speichern</button><button data-a="clear">Leeren</button></div></div></div>
+
+<details class="card"><summary>Materialprofile &amp; Spülmenge</summary>
+<table class="ptab"><thead><tr><th></th><th>Ø Watt</th><th>Ausschuss %</th></tr></thead><tbody id="ptab"></tbody></table>
+<div class="row"><label>AMS-Spülmenge/Stück (g)<input id="purge" type="text" inputmode="decimal"></label>
+<label>Aufheizen/Abkühlen (Wh/Stück)<input id="heat" type="text" inputmode="decimal"></label></div>
+<p class="hint">Startwerte sind Schätzungen für den P1S. Mit einer Messsteckdose über einen ganzen Druck wirst du genauer.</p></details>
 
 <details class="card"><summary>Drucker: Abschreibung &amp; Verschleiß</summary>
 <label class="chk"><input id="depr" type="checkbox"> Druckerabschreibung berücksichtigen</label>
 <div class="row" id="deprF">
-<label>Anschaffungspreis (€)<input id="buy" type="text" inputmode="decimal"></label>
+<label>Kaufpreis (€)<input id="buy" type="text" inputmode="decimal"></label>
 <label>Restwert (€)<input id="rest" type="text" inputmode="decimal"></label>
-<label>Lebensdauer (Druckstunden)<input id="life" type="text" inputmode="numeric"></label>
-</div>
-<div class="row" style="margin-top:10px">
-<label>Düse (€)<input id="nozP" type="text" inputmode="decimal"></label>
-<label>Düse Lebensdauer (h)<input id="nozL" type="text" inputmode="numeric"></label>
-<label>Druckplatte (€)<input id="bedP" type="text" inputmode="decimal"></label>
-<label>Platte Lebensdauer (h)<input id="bedL" type="text" inputmode="numeric"></label>
-<label>Sonstiges (€/h)<input id="misc" type="text" inputmode="decimal"></label>
-</div>
-<p class="hint">Sonstiges: Riemen, Lager, Lüfter, Schmierung als Pauschale pro Druckstunde.</p></details>
-
-<details class="card"><summary>Arbeit, Gemeinkosten &amp; Preis</summary>
+<label>Lebensdauer (h)<input id="life" type="text" inputmode="numeric"></label></div>
 <div class="row">
-<label>Stundensatz Arbeit (€/h)<input id="rate" type="text" inputmode="decimal"></label>
-<label>Rüstzeit pro Auftrag (min)<input id="setup" type="text" inputmode="numeric"></label>
+<label>Düse (€)<input id="nozP" type="text" inputmode="decimal"></label>
+<label>Düse hält (h)<input id="nozL" type="text" inputmode="numeric"></label>
+<label>Druckplatte (€)<input id="bedP" type="text" inputmode="decimal"></label>
+<label>Platte hält (h)<input id="bedL" type="text" inputmode="numeric"></label>
+<label>Sonstiges (€/h)<input id="misc" type="text" inputmode="decimal"></label></div></details>
+
+<details class="card"><summary>Arbeit, Preis &amp; Rabatt</summary>
+<div class="row">
+<label>Stundensatz (€/h)<input id="rate" type="text" inputmode="decimal"></label>
+<label>Rüstzeit/Auftrag (min)<input id="setup" type="text" inputmode="numeric"></label>
 <label>Nachbearbeitung/Stück (min)<input id="post" type="text" inputmode="numeric"></label>
-<label>Verpackung/Versand (€/Auftrag)<input id="ship" type="text" inputmode="decimal"></label>
-<label>Gemeinkosten-Aufschlag (%)<input id="oh" type="text" inputmode="decimal"></label>
-<label>Gewinnaufschlag (%)<input id="mg" type="text" inputmode="decimal"></label>
-<label>MwSt (%)<input id="vat" type="text" inputmode="decimal"></label>
-</div>
-<label class="chk" style="margin-top:12px"><input id="ku" type="checkbox"> Kleinunternehmer (keine MwSt)</label>
-<p class="hint">Gemeinkosten: Software, Versicherung, Raum, Buchhaltung als Prozentaufschlag auf die Selbstkosten.</p></details>
+<label>Versand/Verpackung (€)<input id="ship" type="text" inputmode="decimal"></label>
+<label>Gemeinkosten (%)<input id="oh" type="text" inputmode="decimal"></label>
+<label>Gewinn (%)<input id="mg" type="text" inputmode="decimal"></label>
+<label>Mindestauftrag netto (€)<input id="minOrd" type="text" inputmode="decimal"></label>
+<label>Netto aufrunden auf<select id="round"><option value="0">nicht runden</option><option value="0.1">0,10 €</option><option value="0.5">0,50 €</option><option value="1">1,00 €</option></select></label>
+<label>Rabatt ab Stück<input id="stQty" type="text" inputmode="numeric"></label>
+<label>Rabatt (%)<input id="stPct" type="text" inputmode="decimal"></label>
+<label>MwSt (%)<input id="vat" type="text" inputmode="decimal"></label></div>
+<label class="chk"><input id="ku" type="checkbox"> Kleinunternehmer (keine MwSt)</label></details>
+
+<details class="card"><summary>Gespeicherte Aufträge</summary><div id="jobs"></div><p class="hint" id="nojob">Noch keine Aufträge gespeichert.</p></details>
+
+<details class="card"><summary>Einstellungen sichern / übertragen</summary>
+<p class="hint">Exportieren, den Text aufs andere Gerät schicken und dort einfügen und importieren.</p>
+<textarea id="io" placeholder="Hier steht der Export, oder füge einen Export zum Importieren ein."></textarea>
+<div class="btns"><button id="exp">Exportieren</button><button id="imp">Importieren</button></div></details>
 </div>
 
 <div class="res">
-<div class="card">
-<span class="pill">Preis pro Stück</span>
-<div class="big" id="unit">–</div>
-<div class="hint" id="unitSub"></div>
+<div class="card"><span class="pill">Dieser Druck pro Stück</span>
+<div class="big" id="unit">–</div><div class="hint" id="unitSub"></div>
 <div class="bar" id="bar"></div><div class="leg" id="leg"></div>
 </div>
 <div class="card"><h2>Aufschlüsselung pro Stück</h2><div id="lines"></div></div>
-<div class="card"><h2>Gesamter Auftrag</h2><div id="tot"></div>
-<p class="hint">Ertrag pro Druckstunde: <span id="hourly" class="ok sum">–</span></p></div>
 <button id="reset" style="width:100%">Standardwerte laden</button>
-</div>
-</div>
-</div>
-<div class="bottom"><div><div class="p" id="bp">–</div></div><small id="bs"></small></div>
+</div></div></div>
+<div class="bottom"><div class="p" id="bp">–</div><small id="bs"></small></div>
 
 <script>
 const MATS=["PLA","PETG","TPU","ASA"];
-const D={mat:"PLA",qty:1,gram:50,h:2,m:30,kwh:0.35,depr:true,buy:599,rest:150,life:5000,nozP:8,nozL:500,bedP:30,bedL:1500,misc:0.10,rate:25,setup:5,post:3,ship:0,oh:10,mg:30,vat:19,ku:false,
+const D={P:[],oname:"",mat:"PLA",name:"",qty:1,gram:50,purge:0,h:2,m:30,kwh:0.35,heat:100,depr:true,buy:599,rest:150,life:5000,nozP:8,nozL:500,bedP:30,bedL:1500,misc:0.10,rate:25,setup:5,post:3,ship:0,oh:10,mg:30,minOrd:5,round:"0",stQty:10,stPct:0,vat:19,ku:false,
 prof:{PLA:{watt:90,price:20,fail:5},PETG:{watt:110,price:22,fail:5},TPU:{watt:85,price:30,fail:8},ASA:{watt:140,price:28,fail:8}}};
-const NUM=["qty","gram","h","m","kwh","buy","rest","life","nozP","nozL","bedP","bedL","misc","rate","setup","post","ship","oh","mg","vat"];
+const NUM=["qty","gram","purge","h","m","kwh","heat","buy","rest","life","nozP","nozL","bedP","bedL","misc","rate","setup","post","ship","oh","mg","minOrd","stQty","stPct","vat"];
 const $=i=>document.getElementById(i);
 const eur=n=>n.toLocaleString("de-DE",{style:"currency",currency:"EUR"});
 const num=s=>parseFloat(String(s).replace(",","."))||0;
 const fmt=v=>String(v).replace(".",",");
 const COL=["#2563eb","#f59e0b","#10b981","#ef4444","#8b5cf6","#06b6d4","#ec4899","#64748b","#16a34a"];
-let S;
-function load(){let s={};try{s=JSON.parse(localStorage.getItem("druckkosten2")||"{}")}catch(e){}
- const o=JSON.parse(JSON.stringify(D));Object.assign(o,s);
- MATS.forEach(k=>{o.prof[k]=Object.assign({},D.prof[k],(s.prof||{})[k])});
- if(!MATS.includes(o.mat))o.mat="PLA";return o}
-function save(){try{localStorage.setItem("druckkosten2",JSON.stringify(S))}catch(e){}}
+let S,J=[],R={};
+function clone(o){return JSON.parse(JSON.stringify(o))}
+function merge(s){const o=clone(D);Object.assign(o,s||{});MATS.forEach(k=>{o.prof[k]=Object.assign({},D.prof[k],((s||{}).prof||{})[k])});if(!MATS.includes(o.mat))o.mat="PLA";return o}
+function load(){try{const d=JSON.parse(localStorage.getItem("dk4")||localStorage.getItem("dk3")||"{}");S=merge(d.S);J=(d.J||[]).filter(j=>j.P)}catch(e){S=clone(D)}}
+function save(){try{localStorage.setItem("dk4",JSON.stringify({S,J}))}catch(e){}}
+function copy(t,btn){const ok=()=>{if(btn){const o=btn.textContent;btn.textContent="Kopiert ✓";setTimeout(()=>btn.textContent=o,1500)}};
+ const fb=()=>{const a=document.createElement("textarea");a.value=t;document.body.appendChild(a);a.select();try{document.execCommand("copy");ok()}catch(e){}a.remove()};
+ if(navigator.clipboard)navigator.clipboard.writeText(t).then(ok,fb);else fb()}
 function build(){
  $("seg").innerHTML=MATS.map(k=>`<button data-m="${k}">${k}</button>`).join("");
- $("seg").onclick=e=>{const b=e.target.closest("button");if(!b)return;S.mat=b.dataset.m;sync();calc()};
+ $("seg").onclick=e=>{const b=e.target.closest("button");if(b){S.mat=b.dataset.m;sync();calc()}};
  $("ptab").innerHTML=MATS.map(k=>`<tr><td>${k}</td><td><input type="text" inputmode="decimal" data-k="${k}" data-f="watt"></td><td><input type="text" inputmode="decimal" data-k="${k}" data-f="fail"></td></tr>`).join("");
  document.querySelectorAll("[data-k]").forEach(el=>el.addEventListener("input",()=>{S.prof[el.dataset.k][el.dataset.f]=num(el.value);calc()}));
  NUM.forEach(i=>$(i).addEventListener("input",()=>{S[i]=num($(i).value);calc()}));
  $("fil").addEventListener("input",()=>{S.prof[S.mat].price=num($("fil").value);calc()});
+ $("name").addEventListener("input",()=>{S.name=$("name").value;save()});
+ $("round").addEventListener("change",()=>{S.round=$("round").value;calc()});
  $("depr").addEventListener("change",()=>{S.depr=$("depr").checked;calc()});
  $("ku").addEventListener("change",()=>{S.ku=$("ku").checked;calc()});
- $("reset").addEventListener("click",()=>{S=JSON.parse(JSON.stringify(D));sync();calc()});
+ $("paste").addEventListener("input",()=>{const t=$("paste").value;
+  const h=t.match(/(\d+)\s*(?:h|std)/i),m=t.match(/(\d+)\s*(?:min|m)(?![a-z])/i),g=t.match(/(\d+(?:[.,]\d+)?)\s*g(?![a-z])/i);
+  if(h||m){S.h=h?+h[1]:0;S.m=m?+m[1]:0}if(g)S.gram=num(g[1]);sync();calc()});
+ $("reset").onclick=()=>{const P=S.P,o=S.oname;S=clone(D);S.P=P;S.oname=o;sync();calc()};
+ $("quote").onclick=()=>copy(R.quote,$("quote"));
+$("add").onclick=()=>{S.P.push({name:S.name||S.mat+" "+(S.P.length+1),mat:S.mat,qty:S.qty,gram:S.gram,purge:S.purge,h:S.h,m:S.m});S.name="";$("paste").value="";sync();calc()};
+$("oname").addEventListener("input",()=>{S.oname=$("oname").value;save()});
+$("order").onclick=e=>{const b=e.target.closest("button"),a=b&&b.dataset.a;if(!a)return;const i=+b.dataset.i;
+ if(a==="del")S.P.splice(i,1);else if(a==="clear")S.P=[];else{Object.assign(S,S.P.splice(i,1)[0]);sync();scrollTo(0,0)}
+ calc()};
+$("save").onclick=()=>{if(!S.P.length)return;J.unshift({oname:S.oname||"Auftrag "+(J.length+1),P:clone(S.P),total:R.orderBrutto});J=J.slice(0,30);jobs();save();$("save").textContent="Gespeichert ✓";setTimeout(()=>$("save").textContent="Speichern",1500)};
+$("jobs").onclick=e=>{const b=e.target.closest("button");if(!b)return;const i=+b.dataset.i;
+ if(b.dataset.a==="del")J.splice(i,1);else{S.P=clone(J[i].P);S.oname=J[i].oname;sync();scrollTo(0,0)}
+ jobs();calc()};
+$("exp").onclick=()=>{$("io").value=JSON.stringify({S,J});$("io").select()};
+$("imp").onclick=()=>{try{const d=JSON.parse($("io").value);S=merge(d.S);J=(d.J||[]).filter(j=>j.P);sync();jobs();calc();$("imp").textContent="Importiert ✓"}catch(e){$("imp").textContent="Ungültig"}setTimeout(()=>$("imp").textContent="Importieren",1800)};
 }
+const esc=s=>String(s).replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
+function jobs(){$("nojob").style.display=J.length?"none":"";
+ $("jobs").innerHTML=J.map((j,i)=>`<div class="job"><div>${esc(j.oname)}<small>${j.P.length} Positionen · ${eur(j.total)}</small></div><div><button data-a="load" data-i="${i}">Laden</button> <button data-a="del" data-i="${i}">✕</button></div></div>`).join("")}
 function sync(){
- NUM.forEach(i=>{$(i).value=fmt(S[i])});
- $("depr").checked=S.depr;$("ku").checked=S.ku;
+ NUM.forEach(i=>$(i).value=fmt(S[i]));
+ $("depr").checked=S.depr;$("ku").checked=S.ku;$("name").value=S.name;$("oname").value=S.oname;$("round").value=S.round;
  document.querySelectorAll("#seg button").forEach(b=>b.classList.toggle("on",b.dataset.m===S.mat));
  $("fil").value=fmt(S.prof[S.mat].price);
- document.querySelectorAll("[data-k]").forEach(el=>{el.value=fmt(S.prof[el.dataset.k][el.dataset.f])});
+ document.querySelectorAll("[data-k]").forEach(el=>el.value=fmt(S.prof[el.dataset.k][el.dataset.f]));
 }
+function line(p,v){const pr=v.prof[p.mat],q=Math.max(1,Math.round(p.qty)),hrs=p.h+p.m/60,f=1/(1-Math.min(pr.fail,90)/100);
+ const material=(p.gram+p.purge)/1000*pr.price,strom=(pr.watt/1000*hrs+v.heat/1000)*v.kwh,
+ abschr=v.depr?Math.max(0,v.buy-v.rest)/Math.max(1,v.life)*hrs:0,
+ verschl=(v.nozP/Math.max(1,v.nozL)+v.bedP/Math.max(1,v.bedL)+v.misc)*hrs,
+ ausschuss=(material+strom+abschr+verschl)*(f-1),post=v.post/60*v.rate;
+ return {p,q,hrs,material,strom,abschr,verschl,ausschuss,post,direct:material+strom+abschr+verschl+ausschuss+post}}
+function order(P,v){
+ const L=P.map(p=>line(p,v)),D=L.reduce((a,l)=>a+l.direct*l.q,0),su=v.setup/60*v.rate,E=su+v.ship,st=+v.round;
+ L.forEach(l=>{const sh=D>0?l.direct*l.q/D:1/L.length,c=(l.direct*l.q+E*sh)*(1+v.oh/100);
+  let u=c*(1+v.mg/100)/l.q;if(st>0)u=Math.ceil(u/st-1e-9)*st;
+  if(l.q>=v.stQty&&v.stPct>0)u*=1-v.stPct/100;
+  l.unit=u;l.net=u*l.q;l.cost=c});
+ const sum=L.reduce((a,l)=>a+l.net,0),minAdj=Math.max(0,v.minOrd-sum),netto=sum+minAdj,mwst=v.ku?0:netto*v.vat/100,
+ hrs=L.reduce((a,l)=>a+l.hrs*l.q,0),var_=L.reduce((a,l)=>a+l.q*(l.material+l.strom+l.post),0)+E;
+ return {L,sum,minAdj,netto,cost:L.reduce((a,l)=>a+l.cost,0),mwst,brutto:netto+mwst,hrs,hourly:hrs>0?(netto-var_)/hrs:0}}
 function calc(){
  save();
- const v=S,p=v.prof[v.mat],q=Math.max(1,Math.round(v.qty)),hrs=v.h+v.m/60;
+ const v=S,p=v.prof[v.mat],P=v.P,vf=v.ku?1:1+v.vat/100;
  $("deprF").style.display=v.depr?"":"none";
- $("wattHint").textContent=`${v.mat}: Ø ${fmt(p.watt)} W, ${fmt(p.fail)} % Ausschuss (anpassbar unter Materialprofile)`;
- const f=1/(1-Math.min(p.fail,90)/100);
- const material=v.gram/1000*p.price;
- const strom=p.watt/1000*hrs*v.kwh;
- const abschr=v.depr?(Math.max(0,v.buy-v.rest)/Math.max(1,v.life))*hrs:0;
- const verschl=(v.nozP/Math.max(1,v.nozL)+v.bedP/Math.max(1,v.bedL)+v.misc)*hrs;
- const ausschuss=(material+strom+abschr+verschl)*(f-1);
- const arbeit=((v.setup/q)+v.post)/60*v.rate;
- const versand=v.ship/q;
- const basis=material+strom+abschr+verschl+ausschuss+arbeit+versand;
- const gemein=basis*v.oh/100;
- const selbst=basis+gemein;
- const gewinn=selbst*v.mg/100;
- const netto=selbst+gewinn;
- const mwst=v.ku?0:netto*v.vat/100;
- const brutto=netto+mwst;
- const sub=(v.ku?"ohne MwSt (Kleinunternehmer)":"inkl. "+fmt(v.vat)+" % MwSt")+" · netto "+eur(netto);
- $("unit").textContent=eur(brutto);$("unitSub").textContent=sub;
- $("bp").textContent=eur(brutto)+" / Stk.";$("bs").innerHTML=`Auftrag ${q} Stk.<br>${eur(brutto*q)}`;
- const parts=[["Material",material],["Strom",strom],["Abschreibung",abschr],["Verschleiß",verschl],["Ausschuss",ausschuss],["Arbeit",arbeit],["Versand",versand],["Gemeinkosten",gemein],["Gewinn",gewinn]];
- const tot=netto||1;
- $("bar").innerHTML=parts.map((x,i)=>`<i style="width:${x[1]/tot*100}%;background:${COL[i]}"></i>`).join("");
+ $("wattHint").textContent=`${v.mat}: Ø ${fmt(p.watt)} W, ${fmt(p.fail)} % Ausschuss`;
+ const oc=order([{mat:v.mat,qty:v.qty,gram:v.gram,purge:v.purge,h:v.h,m:v.m}],v),l=oc.L[0],q=l.q,su=v.setup/60*v.rate;
+ const arbeit=l.post+su/q,versand=v.ship/q,basis=l.direct+(su+v.ship)/q,gemein=basis*v.oh/100,selbst=basis+gemein,gewinn=selbst*v.mg/100,netto=oc.netto/q,adj=netto-selbst-gewinn,brutto=oc.brutto/q;
+ $("unit").textContent=eur(brutto);
+ $("unitSub").textContent=(v.ku?"ohne MwSt (Kleinunternehmer)":"inkl. "+fmt(v.vat)+" % MwSt")+" · netto "+eur(netto);
+ $("curHint").textContent=`Dieser Druck: ${eur(brutto)} / Stk.`+(q>1?` · ${eur(brutto*q)} gesamt`:"");
+ const parts=[["Material",l.material],["Strom",l.strom],["Abschreibung",l.abschr],["Verschleiß",l.verschl],["Ausschuss",l.ausschuss],["Arbeit",arbeit],["Versand",versand],["Gemeinkosten",gemein],["Gewinn",gewinn]];
+ const ps=parts.reduce((a,x)=>a+x[1],0)||1;
+ $("bar").innerHTML=parts.map((x,i)=>`<i style="width:${x[1]/ps*100}%;background:${COL[i]}"></i>`).join("");
  $("leg").innerHTML=parts.map((x,i)=>x[1]>0?`<span><b style="background:${COL[i]}"></b>${x[0]}</span>`:"").join("");
- const L=parts.filter(x=>x[0]!=="Abschreibung"||v.depr).map(x=>`<div class="line"><span>${x[0]}</span><span>${eur(x[1])}</span></div>`);
- L.splice(L.length-2,0,`<div class="line sum"><span>Selbstkosten</span><span>${eur(selbst)}</span></div>`);
- L.push(`<div class="line sum"><span>Netto</span><span>${eur(netto)}</span></div>`);
- if(!v.ku)L.push(`<div class="line"><span>MwSt ${fmt(v.vat)} %</span><span>${eur(mwst)}</span></div>`);
- $("lines").innerHTML=L.join("");
- $("tot").innerHTML=`<div class="line"><span>Selbstkosten</span><span>${eur(selbst*q)}</span></div><div class="line"><span>Gewinn</span><span>${eur(gewinn*q)}</span></div><div class="line sum"><span>Netto</span><span>${eur(netto*q)}</span></div><div class="line sum"><span>Brutto (${q} Stk.)</span><span>${eur(brutto*q)}</span></div><div class="line"><span>Druckzeit gesamt</span><span>${(hrs*q).toLocaleString("de-DE",{maximumFractionDigits:1})} h</span></div>`;
- $("hourly").textContent=hrs>0?eur((netto-material-strom-arbeit-versand)/hrs):"–";
+ const Ln=parts.filter(x=>x[0]!=="Abschreibung"||v.depr).map(x=>`<div class="line"><span>${x[0]}</span><span>${eur(x[1])}</span></div>`);
+ Ln.splice(Ln.length-1,0,`<div class="line sum"><span>Selbstkosten</span><span>${eur(selbst)}</span></div>`);
+ if(Math.abs(adj)>0.005)Ln.push(`<div class="line"><span>Rundung/Rabatt/Mindestpreis</span><span>${adj>0?"+":""}${eur(adj)}</span></div>`);
+ Ln.push(`<div class="line sum"><span>Netto</span><span>${eur(netto)}</span></div>`);
+ if(!v.ku)Ln.push(`<div class="line"><span>MwSt ${fmt(v.vat)} %</span><span>${eur(oc.mwst/q)}</span></div>`);
+ $("lines").innerHTML=Ln.join("");
+ const O=P.length?order(P,v):null;
+ $("noP").style.display=O?"none":"";$("ordx").style.display=O?"":"none";
+ $("plist").innerHTML=O?O.L.map((x,i)=>`<div class="job"><div>${esc(x.p.name)}<small>${x.q} × ${x.p.mat} · ${eur(x.unit*vf)} / Stk. · ${eur(x.net*vf)}</small></div><div><button data-a="edit" data-i="${i}">Ändern</button> <button data-a="del" data-i="${i}">✕</button></div></div>`).join(""):"";
+ if(O){
+  R.orderBrutto=O.brutto;
+  $("tot").innerHTML=`<div class="line"><span>Positionen netto</span><span>${eur(O.sum)}</span></div>`+(O.minAdj>0?`<div class="line"><span>Zuschlag Mindestauftrag</span><span>${eur(O.minAdj)}</span></div>`:"")+`<div class="line sum"><span>Netto</span><span>${eur(O.netto)}</span></div>`+(v.ku?"":`<div class="line"><span>MwSt ${fmt(v.vat)} %</span><span>${eur(O.mwst)}</span></div>`)+`<div class="line sum"><span>Brutto</span><span>${eur(O.brutto)}</span></div><div class="line"><span>Druckzeit gesamt</span><span>${O.hrs.toLocaleString("de-DE",{maximumFractionDigits:1})} h</span></div><div class="line"><span>Selbstkosten / Gewinn</span><span>${eur(O.cost)} / ${eur(O.netto-O.cost)}</span></div>`;
+  $("hourly").textContent=eur(O.hourly);
+  R.quote=`Angebot${v.oname?": "+v.oname:""}\n`+O.L.map(x=>`• ${x.q} × ${x.p.name} (${x.p.mat}): ${eur(x.unit*vf)}${x.q>1?" / Stk. = "+eur(x.net*vf):""}`).join("\n")+(O.minAdj>0?`\nZuschlag Mindestauftragswert: ${eur(O.minAdj*vf)}`:"")+`\nGesamt: ${eur(O.brutto)}${v.ku?"":" (netto "+eur(O.netto)+")"}\n`+(v.ku?"Gemäß § 19 UStG wird keine Umsatzsteuer berechnet.":"Alle Preise inkl. "+fmt(v.vat)+" % MwSt.");
+ }
+ $("bp").textContent=O?eur(O.brutto):eur(brutto)+" / Stk.";
+ $("bs").innerHTML=O?`Auftrag · ${P.length} Pos.<br>dieser Druck ${eur(brutto)}`:`${q} Stk.<br>${eur(brutto*q)}`;
 }
-S=load();build();sync();calc();
+load();build();sync();jobs();calc();
 </script>
 </body>
 </html>
