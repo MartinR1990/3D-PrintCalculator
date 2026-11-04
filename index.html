@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>3D-Druck Kostenrechner</title>
+<style>
+:root{--bg:#f6f7f9;--card:#fff;--tx:#1b1f24;--mu:#5d6772;--bd:#dde1e6;--ac:#2563eb;--acs:#e8efff;--ok:#15803d;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#14171b;--card:#1c2127;--tx:#e8ebef;--mu:#9aa5b1;--bd:#2c333b;--ac:#6ea0ff;--acs:#1f2b44;--ok:#4ade80}}
+:root[data-theme="dark"]{--bg:#14171b;--card:#1c2127;--tx:#e8ebef;--mu:#9aa5b1;--bd:#2c333b;--ac:#6ea0ff;--acs:#1f2b44;--ok:#4ade80}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif}
+.wrap{max-width:1000px;margin:0 auto;padding:14px 14px 110px}
+h1{font-size:22px;margin:4px 0 12px}
+.grid{display:grid;grid-template-columns:1fr 340px;gap:16px;align-items:start}
+@media(max-width:860px){.grid{grid-template-columns:1fr}}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:14px;margin-bottom:12px}
+.card h2{font-size:15px;margin:0 0 10px}
+.row{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+@media(min-width:560px){.row{grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}}
+label{display:block;font-size:13px;color:var(--mu)}
+input[type=text]{width:100%;margin-top:4px;padding:11px 10px;font:inherit;font-size:16px;color:var(--tx);background:var(--bg);border:1px solid var(--bd);border-radius:10px;-webkit-appearance:none;appearance:none}
+input:focus{outline:2px solid var(--ac)}
+.seg{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:12px}
+.seg button{padding:12px 0;font-weight:600;border-radius:10px}
+.seg button.on{background:var(--ac);color:#fff;border-color:var(--ac)}
+@media(prefers-color-scheme:dark){.seg button.on{color:#0b1220}}
+button{font:inherit;padding:10px 12px;border-radius:10px;border:1px solid var(--bd);background:var(--card);color:var(--tx);cursor:pointer}
+.big{font-size:34px;font-weight:700;letter-spacing:-.5px}
+.pill{display:inline-block;background:var(--acs);color:var(--ac);border-radius:99px;padding:2px 10px;font-size:12px;font-weight:600}
+.line{display:flex;justify-content:space-between;gap:8px;padding:6px 0;border-bottom:1px dashed var(--bd)}
+.line:last-child{border:0}
+.line span:first-child{color:var(--mu)}
+.sum{font-weight:700}.sum span:first-child{color:var(--tx)!important}
+.bar{height:10px;border-radius:6px;overflow:hidden;display:flex;margin:10px 0 6px;background:var(--bd)}
+.bar i{display:block;height:100%}
+.leg{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:12px;color:var(--mu)}
+.leg b{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:4px}
+.hint{font-size:12.5px;color:var(--mu);margin:8px 0 0}
+.ok{color:var(--ok)}
+details.card summary{font-weight:600;cursor:pointer;font-size:15px;padding:2px 0}
+details.card[open] summary{margin-bottom:12px}
+.chk{display:flex;align-items:center;gap:10px;color:var(--tx);font-size:15px;margin:4px 0 10px}
+.chk input{width:22px;height:22px;margin:0}
+.ptab{width:100%;border-collapse:collapse;font-size:14px}
+.ptab th{text-align:left;color:var(--mu);font-weight:500;font-size:12.5px;padding:0 4px 4px}
+.ptab td{padding:3px 4px}
+.ptab td:first-child{font-weight:600;width:60px}
+.res{position:sticky;top:calc(env(safe-area-inset-top,0px) + 12px)}
+.bottom{display:none}
+@media(max-width:860px){
+ .res{position:static}
+ .bottom{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:10;justify-content:space-between;align-items:center;gap:10px;background:var(--card);border-top:1px solid var(--bd);padding:10px 16px calc(10px + env(safe-area-inset-bottom,0px))}
+ .bottom .p{font-size:26px;font-weight:700}
+ .bottom small{color:var(--mu);display:block;font-size:12px;text-align:right}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>3D-Druck Kostenrechner</h1>
+<div class="grid">
+<div>
+<div class="card">
+<div class="seg" id="seg"></div>
+<div class="row">
+<label>Filamentpreis (€/kg)<input id="fil" type="text" inputmode="decimal"></label>
+<label>Strompreis (€/kWh)<input id="kwh" type="text" inputmode="decimal"></label>
+<label>Gewicht pro Stück (g)<input id="gram" type="text" inputmode="decimal"></label>
+<label>Stückzahl<input id="qty" type="text" inputmode="numeric"></label>
+<label>Druckzeit Stunden<input id="h" type="text" inputmode="numeric"></label>
+<label>Druckzeit Minuten<input id="m" type="text" inputmode="numeric"></label>
+</div>
+<p class="hint" id="wattHint"></p>
+</div>
+
+<details class="card"><summary>Materialprofile (Leistung &amp; Ausschuss)</summary>
+<table class="ptab"><thead><tr><th></th><th>Ø Leistung (W)</th><th>Ausschuss (%)</th></tr></thead><tbody id="ptab"></tbody></table>
+<p class="hint">Startwerte sind Schätzungen für den Bambu Lab P1S inkl. Heizbett, Düse und Lüfter. ASA und PETG ziehen mehr wegen heißerem Bett und Kammer. Am genauesten wird es mit einer Messsteckdose über einen kompletten Druck.</p></details>
+
+<details class="card"><summary>Drucker: Abschreibung &amp; Verschleiß</summary>
+<label class="chk"><input id="depr" type="checkbox"> Druckerabschreibung berücksichtigen</label>
+<div class="row" id="deprF">
+<label>Anschaffungspreis (€)<input id="buy" type="text" inputmode="decimal"></label>
+<label>Restwert (€)<input id="rest" type="text" inputmode="decimal"></label>
+<label>Lebensdauer (Druckstunden)<input id="life" type="text" inputmode="numeric"></label>
+</div>
+<div class="row" style="margin-top:10px">
+<label>Düse (€)<input id="nozP" type="text" inputmode="decimal"></label>
+<label>Düse Lebensdauer (h)<input id="nozL" type="text" inputmode="numeric"></label>
+<label>Druckplatte (€)<input id="bedP" type="text" inputmode="decimal"></label>
+<label>Platte Lebensdauer (h)<input id="bedL" type="text" inputmode="numeric"></label>
+<label>Sonstiges (€/h)<input id="misc" type="text" inputmode="decimal"></label>
+</div>
+<p class="hint">Sonstiges: Riemen, Lager, Lüfter, Schmierung als Pauschale pro Druckstunde.</p></details>
+
+<details class="card"><summary>Arbeit, Gemeinkosten &amp; Preis</summary>
+<div class="row">
+<label>Stundensatz Arbeit (€/h)<input id="rate" type="text" inputmode="decimal"></label>
+<label>Rüstzeit pro Auftrag (min)<input id="setup" type="text" inputmode="numeric"></label>
+<label>Nachbearbeitung/Stück (min)<input id="post" type="text" inputmode="numeric"></label>
+<label>Verpackung/Versand (€/Auftrag)<input id="ship" type="text" inputmode="decimal"></label>
+<label>Gemeinkosten-Aufschlag (%)<input id="oh" type="text" inputmode="decimal"></label>
+<label>Gewinnaufschlag (%)<input id="mg" type="text" inputmode="decimal"></label>
+<label>MwSt (%)<input id="vat" type="text" inputmode="decimal"></label>
+</div>
+<label class="chk" style="margin-top:12px"><input id="ku" type="checkbox"> Kleinunternehmer (keine MwSt)</label>
+<p class="hint">Gemeinkosten: Software, Versicherung, Raum, Buchhaltung als Prozentaufschlag auf die Selbstkosten.</p></details>
+</div>
+
+<div class="res">
+<div class="card">
+<span class="pill">Preis pro Stück</span>
+<div class="big" id="unit">–</div>
+<div class="hint" id="unitSub"></div>
+<div class="bar" id="bar"></div><div class="leg" id="leg"></div>
+</div>
+<div class="card"><h2>Aufschlüsselung pro Stück</h2><div id="lines"></div></div>
+<div class="card"><h2>Gesamter Auftrag</h2><div id="tot"></div>
+<p class="hint">Ertrag pro Druckstunde: <span id="hourly" class="ok sum">–</span></p></div>
+<button id="reset" style="width:100%">Standardwerte laden</button>
+</div>
+</div>
+</div>
+<div class="bottom"><div><div class="p" id="bp">–</div></div><small id="bs"></small></div>
+
+<script>
+const MATS=["PLA","PETG","TPU","ASA"];
+const D={mat:"PLA",qty:1,gram:50,h:2,m:30,kwh:0.35,depr:true,buy:599,rest:150,life:5000,nozP:8,nozL:500,bedP:30,bedL:1500,misc:0.10,rate:25,setup:5,post:3,ship:0,oh:10,mg:30,vat:19,ku:false,
+prof:{PLA:{watt:90,price:20,fail:5},PETG:{watt:110,price:22,fail:5},TPU:{watt:85,price:30,fail:8},ASA:{watt:140,price:28,fail:8}}};
+const NUM=["qty","gram","h","m","kwh","buy","rest","life","nozP","nozL","bedP","bedL","misc","rate","setup","post","ship","oh","mg","vat"];
+const $=i=>document.getElementById(i);
+const eur=n=>n.toLocaleString("de-DE",{style:"currency",currency:"EUR"});
+const num=s=>parseFloat(String(s).replace(",","."))||0;
+const fmt=v=>String(v).replace(".",",");
+const COL=["#2563eb","#f59e0b","#10b981","#ef4444","#8b5cf6","#06b6d4","#ec4899","#64748b","#16a34a"];
+let S;
+function load(){let s={};try{s=JSON.parse(localStorage.getItem("druckkosten2")||"{}")}catch(e){}
+ const o=JSON.parse(JSON.stringify(D));Object.assign(o,s);
+ MATS.forEach(k=>{o.prof[k]=Object.assign({},D.prof[k],(s.prof||{})[k])});
+ if(!MATS.includes(o.mat))o.mat="PLA";return o}
+function save(){try{localStorage.setItem("druckkosten2",JSON.stringify(S))}catch(e){}}
+function build(){
+ $("seg").innerHTML=MATS.map(k=>`<button data-m="${k}">${k}</button>`).join("");
+ $("seg").onclick=e=>{const b=e.target.closest("button");if(!b)return;S.mat=b.dataset.m;sync();calc()};
+ $("ptab").innerHTML=MATS.map(k=>`<tr><td>${k}</td><td><input type="text" inputmode="decimal" data-k="${k}" data-f="watt"></td><td><input type="text" inputmode="decimal" data-k="${k}" data-f="fail"></td></tr>`).join("");
+ document.querySelectorAll("[data-k]").forEach(el=>el.addEventListener("input",()=>{S.prof[el.dataset.k][el.dataset.f]=num(el.value);calc()}));
+ NUM.forEach(i=>$(i).addEventListener("input",()=>{S[i]=num($(i).value);calc()}));
+ $("fil").addEventListener("input",()=>{S.prof[S.mat].price=num($("fil").value);calc()});
+ $("depr").addEventListener("change",()=>{S.depr=$("depr").checked;calc()});
+ $("ku").addEventListener("change",()=>{S.ku=$("ku").checked;calc()});
+ $("reset").addEventListener("click",()=>{S=JSON.parse(JSON.stringify(D));sync();calc()});
+}
+function sync(){
+ NUM.forEach(i=>{$(i).value=fmt(S[i])});
+ $("depr").checked=S.depr;$("ku").checked=S.ku;
+ document.querySelectorAll("#seg button").forEach(b=>b.classList.toggle("on",b.dataset.m===S.mat));
+ $("fil").value=fmt(S.prof[S.mat].price);
+ document.querySelectorAll("[data-k]").forEach(el=>{el.value=fmt(S.prof[el.dataset.k][el.dataset.f])});
+}
+function calc(){
+ save();
+ const v=S,p=v.prof[v.mat],q=Math.max(1,Math.round(v.qty)),hrs=v.h+v.m/60;
+ $("deprF").style.display=v.depr?"":"none";
+ $("wattHint").textContent=`${v.mat}: Ø ${fmt(p.watt)} W, ${fmt(p.fail)} % Ausschuss (anpassbar unter Materialprofile)`;
+ const f=1/(1-Math.min(p.fail,90)/100);
+ const material=v.gram/1000*p.price;
+ const strom=p.watt/1000*hrs*v.kwh;
+ const abschr=v.depr?(Math.max(0,v.buy-v.rest)/Math.max(1,v.life))*hrs:0;
+ const verschl=(v.nozP/Math.max(1,v.nozL)+v.bedP/Math.max(1,v.bedL)+v.misc)*hrs;
+ const ausschuss=(material+strom+abschr+verschl)*(f-1);
+ const arbeit=((v.setup/q)+v.post)/60*v.rate;
+ const versand=v.ship/q;
+ const basis=material+strom+abschr+verschl+ausschuss+arbeit+versand;
+ const gemein=basis*v.oh/100;
+ const selbst=basis+gemein;
+ const gewinn=selbst*v.mg/100;
+ const netto=selbst+gewinn;
+ const mwst=v.ku?0:netto*v.vat/100;
+ const brutto=netto+mwst;
+ const sub=(v.ku?"ohne MwSt (Kleinunternehmer)":"inkl. "+fmt(v.vat)+" % MwSt")+" · netto "+eur(netto);
+ $("unit").textContent=eur(brutto);$("unitSub").textContent=sub;
+ $("bp").textContent=eur(brutto)+" / Stk.";$("bs").innerHTML=`Auftrag ${q} Stk.<br>${eur(brutto*q)}`;
+ const parts=[["Material",material],["Strom",strom],["Abschreibung",abschr],["Verschleiß",verschl],["Ausschuss",ausschuss],["Arbeit",arbeit],["Versand",versand],["Gemeinkosten",gemein],["Gewinn",gewinn]];
+ const tot=netto||1;
+ $("bar").innerHTML=parts.map((x,i)=>`<i style="width:${x[1]/tot*100}%;background:${COL[i]}"></i>`).join("");
+ $("leg").innerHTML=parts.map((x,i)=>x[1]>0?`<span><b style="background:${COL[i]}"></b>${x[0]}</span>`:"").join("");
+ const L=parts.filter(x=>x[0]!=="Abschreibung"||v.depr).map(x=>`<div class="line"><span>${x[0]}</span><span>${eur(x[1])}</span></div>`);
+ L.splice(L.length-2,0,`<div class="line sum"><span>Selbstkosten</span><span>${eur(selbst)}</span></div>`);
+ L.push(`<div class="line sum"><span>Netto</span><span>${eur(netto)}</span></div>`);
+ if(!v.ku)L.push(`<div class="line"><span>MwSt ${fmt(v.vat)} %</span><span>${eur(mwst)}</span></div>`);
+ $("lines").innerHTML=L.join("");
+ $("tot").innerHTML=`<div class="line"><span>Selbstkosten</span><span>${eur(selbst*q)}</span></div><div class="line"><span>Gewinn</span><span>${eur(gewinn*q)}</span></div><div class="line sum"><span>Netto</span><span>${eur(netto*q)}</span></div><div class="line sum"><span>Brutto (${q} Stk.)</span><span>${eur(brutto*q)}</span></div><div class="line"><span>Druckzeit gesamt</span><span>${(hrs*q).toLocaleString("de-DE",{maximumFractionDigits:1})} h</span></div>`;
+ $("hourly").textContent=hrs>0?eur((netto-material-strom-arbeit-versand)/hrs):"–";
+}
+S=load();build();sync();calc();
+</script>
+</body>
+</html>
